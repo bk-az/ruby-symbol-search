@@ -1,71 +1,45 @@
-# ruby-symbol-search README
+# Ruby Symbol Search Extension
 
-This is the README for your extension "ruby-symbol-search". After writing up a brief description, we recommend including the following sections.
+## Overview
+The **Ruby Symbol Search** is a Visual Studio Code extension designed for efficient navigation and search of Ruby symbols, such as classes, modules, and methods, in your project. This extension dynamically indexes Ruby files in the workspace and provides powerful search capabilities using FlexSearch.
 
 ## Features
+- **Efficient Symbol Search**: Quickly locate Ruby classes, modules, and methods.
+- **Real-Time Indexing**: Dynamically updates the index as files are created, modified, or deleted.
+- **Exclusion Rules**: Configure specific folders to exclude from the indexing process.
+- **Auto Indexing**: Automatically indexes all Ruby files when the workspace is opened.
+- **Quick Navigation**: Jump directly to the symbol's location in the editor.
+- **Command Palette Integration**: Easily index or search symbols using commands.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Commands
+The following commands are available via the Command Palette:
+1. **Index Ruby Symbols** (`rubySymbolSearch.index`): Manually trigger indexing of all Ruby files in the workspace.
+2. **Search Ruby Symbols** (`rubySymbolSearch.search`): Search and navigate to specific symbols.
 
-For example if there is an image subfolder under your extension project workspace:
+## Configuration
+You can customize the extension through these settings in the `settings.json` file:
 
-\!\[feature X\]\(images/feature-x.png\)
+1. **`rubySymbolSearch.excludedFolders`**
+   - **Type**: `Array<string>`
+   - **Default**: `[]`
+   - **Description**: List of folders to exclude from indexing.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+2. **`rubySymbolSearch.autoIndex`**
+   - **Type**: `boolean`
+   - **Default**: `true`
+   - **Description**: Automatically index all Ruby files on workspace startup.
 
-## Requirements
+## How to Use
+1. **Install the Extension**:
+   - Search for "Ruby Symbol Search" in the VS Code Marketplace and install it.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+2. **Start Indexing**:
+   - By default, the extension indexes all Ruby files when the workspace opens.
+   - Alternatively, trigger the indexing manually using the `Index Ruby Symbols` command.
 
-## Extension Settings
+3. **Search for Symbols**:
+   - Use the `Search Ruby Symbols` command from the Command Palette to find and navigate to symbols.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+4. **Navigate to Results**:
+   - Select a result to open the file and jump directly to the symbol in the editor.
 
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
