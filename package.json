@@ -4,6 +4,9 @@
   "description": "Effortlessly explore and pinpoint Ruby symbols in your codebase with lightning-fast precision.",
   "version": "0.0.1",
   "publisher": "bkaz",
+  "repository": {
+    "url": "https://github.com/bk-az/ruby-symbol-search"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
