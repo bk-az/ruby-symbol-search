@@ -87,7 +87,7 @@ export default class Formatter {
         return "$(filter)";
       case "alias":
         return "$(copy)";
-      case "accessor":
+      case "attr":
         return "$(symbol-variable)";
       case "association":
         return "$(link)";
