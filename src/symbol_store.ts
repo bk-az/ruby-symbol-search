@@ -1,4 +1,4 @@
-import FlexSearch, { IndexSearchResult } from "flexsearch";
+import Fuse from "fuse.js";
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
@@ -12,11 +12,9 @@ export default class SymbolStore {
   idCounter: number;
   symbolIdMap: Record<number, string>;
   fileIdMap: Record<number, string>;
-  reverseIndex: FlexSearch.Index;
-  forwardIndex: FlexSearch.Index;
-  wordIndex: FlexSearch.Index;
-  fileIndex: FlexSearch.Index;
   excludedFolders: string[];
+  fuseIndex: Fuse<string>;
+  indexInProgress: boolean;
 
   constructor() {
     this.globalSymbols = {};
@@ -24,106 +22,57 @@ export default class SymbolStore {
     this.symbolIdMap = {};
     this.fileIdMap = {};
     this.idCounter = 1;
-    this.reverseIndex = new FlexSearch.Index({
-      encode: (str) =>
-        str
-          .replace(/([a-z])([A-Z])/g, "$1_$2")
-          .toLowerCase()
-          .split(/[^a-z]+/),
-      tokenize: "reverse",
+    this.fuseIndex = new Fuse([], {
+      includeScore: true,
+      threshold: 0.5,
+      findAllMatches: true,
+      shouldSort: true,
+      minMatchCharLength: 2,
     });
-    this.forwardIndex = new FlexSearch.Index({
-      encode: (str) =>
-        str
-          .replace(/([a-z])([A-Z])/g, "$1_$2")
-          .toLowerCase()
-          .split(/[^a-z]+/),
-      tokenize: "forward",
-    });
-    this.wordIndex = new FlexSearch.Index({
-      encode: (str) =>
-        str
-          .replace(/([a-z])([A-Z])/g, "$1_$2")
-          .toLowerCase()
-          .split(/[^a-z]+/),
-      tokenize: "strict",
-    });
-    this.fileIndex = new FlexSearch.Index({
-      encode: (str) => str.split(".")[0].split(/[^a-z]+/),
-      tokenize: "strict",
-    });
+    this.indexInProgress = false;
     const config = vscode.workspace.getConfiguration("rubySymbolSearch");
     this.excludedFolders = config.get<string[]>("excludedFolders", []);
   }
 
   search(query: string): SymbolSearchEntry[] {
-    const reverseResults = this.reverseIndex.search(query, { suggest: true });
-    const forwardResults = this.forwardIndex.search(query, { suggest: true });
-    const wordResults = this.wordIndex.search(query, { suggest: true });
-    const fileResults = this.fileIndex.search(query);
-
-    const combinedResults: Record<number, number> = {};
-
-    const addScores = (
-      results: IndexSearchResult,
-      multiplier: number,
-      type: string
-    ) => {
-      let ids = results;
-      if (type === "file") {
-        ids = [];
-        for (const fileId of results) {
-          const fileName = this.fileIdMap[Number(fileId)];
-          if (!fileName) {
-            continue;
-          }
-
-          const fileData = this.fileSymbols[fileName];
-          if (!fileData) {
-            continue;
-          }
-
-          fileData.symbolIds.forEach((id) => {
-            if (!ids.includes(id)) {
-              ids.push(id);
-            }
-          });
-        }
-      }
-      ids.forEach((id, index) => {
-        const score = (results.length - index) * multiplier;
-        if (combinedResults[Number(id)]) {
-          combinedResults[Number(id)] += score;
-        } else {
-          combinedResults[Number(id)] = score;
-        }
-      });
-    };
-
-    addScores(wordResults, 4, "sym");
-    addScores(forwardResults, 6, "sym");
-    addScores(reverseResults, 2, "sym");
-    addScores(fileResults, 2, "file");
-
-    const sortedIds = Object.keys(combinedResults)
-      .map(Number)
-      .sort((a, b) => combinedResults[b] - combinedResults[a]);
-
+    let [searchTerm, fileQuery] = query.split("@");
+    let symbols: string[] = [];
+    let fileQueryTerms: string[] = [];
+    if (fileQuery) {
+      fileQueryTerms = fileQuery
+        .trim()
+        .split(" ")
+        .map((e) => e.trim());
+    }
+    if (!searchTerm && fileQueryTerms) {
+      symbols = Object.keys(this.fileSymbols)
+        .filter((f) => fileQueryTerms.every((term) => f.includes(term)))
+        .flatMap((f) => this.fileSymbols[f].symbolIds)
+        .map((id) => this.symbolIdMap[id]);
+    } else {
+      const results = this.fuseIndex.search(searchTerm.trim());
+      symbols = results.map((r) => r.item);
+    }
     const result: SymbolSearchEntry[] = [];
-    for (const id of sortedIds) {
-      const symbol = this.symbolIdMap[id];
-      if (!symbol) {
-        continue;
-      }
-
+    for (const symbol of symbols) {
       const globalEntry = this.globalSymbols[symbol];
       if (!globalEntry) {
         continue;
       }
 
+      let locations = globalEntry.locations;
+      if (fileQueryTerms) {
+        locations = locations.filter((l) =>
+          fileQueryTerms.every((term) => l.file.includes(term))
+        );
+      }
+
+      if (locations.length === 0) {
+        continue;
+      }
       result.push({
         symbol,
-        locations: globalEntry.locations,
+        locations,
       });
     }
 
@@ -133,22 +82,27 @@ export default class SymbolStore {
   async index() {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
-      vscode.window.showErrorMessage(
-        "No workspace is open. Please open a workspace to index files."
-      );
       return;
     }
 
+    const statusBarItem = vscode.window.createStatusBarItem();
+    statusBarItem.text = "$(sync~spin) Ruby Symbols: Indexing";
+    statusBarItem.show();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    this.indexInProgress = true;
     for (const folder of workspaceFolders) {
-      const folderUri = folder.uri;
-      const folderPath = folderUri.fsPath;
+      const folderPath = folder.uri.fsPath;
 
       if (!this.isExcluded(folderPath)) {
         await this.indexFolder(folderPath);
       }
     }
 
-    vscode.window.showInformationMessage("Ruby symbol indexing complete.");
+    this.indexInProgress = false;
+    this.fuseIndex.setCollection(Object.keys(this.globalSymbols));
+    statusBarItem.text = "$(check-all) Ruby Symbols: Indexing Done";
+    setTimeout(() => statusBarItem.hide(), 10000);
   }
 
   async indexFolder(folderPath: string) {
@@ -173,11 +127,10 @@ export default class SymbolStore {
     if (this.isExcluded(filePath)) {
       return;
     }
-    const relativePath = vscode.workspace.asRelativePath(filePath);
     const content = fs.readFileSync(filePath, "utf-8");
     const parser = new FileParser(filePath, content);
 
-    this.removeFileSymbols(relativePath);
+    this.removeFileSymbols(filePath);
 
     parser.getSymbols().forEach((symbol: Symbol) => {
       this.registerSymbol(symbol);
@@ -185,18 +138,18 @@ export default class SymbolStore {
   }
 
   registerSymbol(symbol: Symbol) {
-    const { symbol: symbolName, file, line, type } = symbol;
+    const { symbol: symbolName, file, startLine, type } = symbol;
 
     let globalEntry = this.globalSymbols[symbolName];
     if (!globalEntry) {
       globalEntry = { id: this.idCounter++, locations: [] };
       this.globalSymbols[symbolName] = globalEntry;
-      this.reverseIndex.add(globalEntry.id, symbolName);
-      this.forwardIndex.add(globalEntry.id, symbolName);
-      this.wordIndex.add(globalEntry.id, symbolName);
+      if (!this.indexInProgress) {
+        this.fuseIndex.add(symbolName);
+      }
     }
 
-    globalEntry.locations.push({ file, line, type });
+    globalEntry.locations.push({ file, startLine, type });
 
     let fileData = this.fileSymbols[file];
     if (!fileData) {
@@ -205,7 +158,6 @@ export default class SymbolStore {
         symbolIds: [],
       };
       this.fileSymbols[file] = fileData;
-      this.fileIndex.add(fileData.id, file);
     }
 
     fileData.symbolIds.push(globalEntry.id);
@@ -233,13 +185,12 @@ export default class SymbolStore {
       if (globalEntry.locations.length === 0) {
         delete this.globalSymbols[sym];
         delete this.symbolIdMap[id];
-        this.reverseIndex.remove(id);
-        this.forwardIndex.remove(id);
-        this.wordIndex.remove(id);
+        this.fuseIndex.remove((doc) => {
+          return doc === sym;
+        });
       }
     }
 
-    this.fileIndex.remove(fileData.id);
     delete this.fileIdMap[fileData.id];
     delete this.fileSymbols[file];
   }

@@ -1,5 +1,40 @@
 import { Symbol, SymbolType } from "./types";
 
+const symbolPatterns: Array<{ regex: RegExp; type: SymbolType }> = [
+  {
+    regex: /^\s*class\s+([A-Z][A-Za-z0-9_]*(?:::[A-Z][A-Za-z0-9_]*)*)\b/,
+    type: "class",
+  },
+  {
+    regex: /^\s*module\s+([A-Z][A-Za-z0-9_]*(?:::[A-Z][A-Za-z0-9_]*)*)\b/,
+    type: "module",
+  },
+  {
+    regex:
+      /^\s*def\s+(?:(?:[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*|self)\.)?([a-zA-Z_][A-Za-z0-9_]*[!?=]?)/,
+    type: "method",
+  },
+  {
+    regex: /^\s*(?:::)?([A-Z][A-Za-z0-9_]*(?:::[A-Z][A-Za-z0-9_]*)*)\s*=\s+/,
+    type: "constant",
+  },
+  { regex: /\s*scope\s+:([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/, type: "scope" },
+  { regex: /^\s*alias\s+([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/, type: "alias" },
+  {
+    regex: /^\s*alias_method\s+:?([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/,
+    type: "alias",
+  },
+  {
+    regex:
+      /^\s*attr_(?:reader|writer|accessor)\s+((?::[a-zA-Z0-9_]+)(?:\s*,\s*:[a-zA-Z0-9_]+)*)/,
+    type: "accessor",
+  },
+  {
+    regex:
+      /^\s*(?:belongs_to|has_one|has_many|has_and_belongs_to_many)\s+:(\w+)/,
+    type: "association",
+  },
+];
 export default class FileParser {
   file: string;
   content: string;
@@ -13,61 +48,33 @@ export default class FileParser {
     const lines = this.content.split("\n");
     const symbolList: Symbol[] = [];
 
-    const symbolPatterns: Array<{ regex: RegExp; type: SymbolType }> = [
-      { regex: /^\s*class\s+(\w+)/, type: "class" },
-      { regex: /^\s*module\s+(\w+)/, type: "module" },
-      {
-        regex: /^\s*def\s+(?![A-Z][a-zA-Z0-9_]*\.)[a-zA-Z_][a-zA-Z0-9_]*[!?=]?/,
-        type: "method",
-      },
-      { regex: /^\s*([A-Z][A-Z0-9_]*)\s*=\s+/, type: "constant" },
-      { regex: /\s*scope\s+:([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/, type: "scope" },
-      { regex: /^\s*alias\s+([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/, type: "alias" },
-      {
-        regex: /^\s*alias_method\s+:?([a-zA-Z_][a-zA-Z0-9_]*[!?=]?)/,
-        type: "alias",
-      },
-      {
-        regex:
-          /^\s*attr_(reader|writer|accessor)\s+((?::[a-zA-Z0-9_]+)(?:\s*,\s*:[a-zA-Z0-9_]+)*)/,
-        type: "accessor",
-      },
-      {
-        regex:
-          /^\s*(belongs_to|has_one|has_many|has_and_belongs_to_many)\s+:(\w+)/,
-        type: "association",
-      },
-    ];
-
     lines.forEach((line, lineNumber) => {
+      if (line.trim().startsWith("# ")) {
+        return;
+      }
       symbolPatterns.forEach(({ regex, type }) => {
         const match = line.match(regex);
         if (match) {
+          const capturedSymbol = match[1].trim();
+          const startLine = lineNumber + 1;
           if (type === "accessor") {
-            const accessorSymbolsPart = match[2];
-            const individualSymbols = accessorSymbolsPart
+            const individualSymbols = capturedSymbol
               .split(/\s*,\s*/)
               .map((s) => s.replace(/^:/, ""));
 
             individualSymbols.forEach((sym) => {
               symbolList.push({
-                symbol: sym,
+                symbol: sym.trim(),
                 file: this.file,
-                line: lineNumber + 1,
+                startLine,
                 type,
               });
             });
           } else {
-            let capturedSymbol = match[1];
-
-            if (type === "association") {
-              capturedSymbol = match[2];
-            }
-
             symbolList.push({
-              symbol: capturedSymbol,
+              symbol: capturedSymbol.trim(),
               file: this.file,
-              line: lineNumber + 1,
+              startLine,
               type,
             });
           }

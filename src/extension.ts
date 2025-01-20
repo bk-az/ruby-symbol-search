@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import SymbolStore from "./symbol_store";
 import LiveSearch from "./live_search";
+import RubyDocumentSymbolProvider from "./ruby_document_symbol_provider";
 
 const config = vscode.workspace.getConfiguration("rubySymbolSearch");
 const autoIndex = config.get<boolean>("autoIndex", true);
@@ -35,20 +36,18 @@ function watchFileChanges(context: vscode.ExtensionContext) {
 }
 
 async function searchRubySymbolsLive() {
-  const search = new LiveSearch(symbolStore, getBasePath());
+  const search = new LiveSearch(symbolStore);
   search.init();
 }
 
-function getBasePath() {
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (!workspaceFolders) {
-    return "";
-  }
-
-  return workspaceFolders[0].uri.fsPath;
-}
-
 export function activate(context: vscode.ExtensionContext) {
+  const documentSymbolProvider =
+    vscode.languages.registerDocumentSymbolProvider(
+      { scheme: "file", language: "ruby" },
+      new RubyDocumentSymbolProvider()
+    );
+
+  context.subscriptions.push(documentSymbolProvider);
   const indexCommand = vscode.commands.registerCommand(
     "rubySymbolSearch.index",
     indexRubyFiles
@@ -62,17 +61,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(searchCommand);
 
   if (autoIndex) {
-    vscode.window.showInformationMessage(
-      "Auto-indexing Ruby symbols on startup..."
-    );
     indexRubyFiles();
   }
 
   watchFileChanges(context);
-
-  vscode.window.showInformationMessage(
-    "Ruby Symbol Search extension is active."
-  );
 }
 
 export function deactivate() {}

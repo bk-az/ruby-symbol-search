@@ -10,12 +10,13 @@ export type SymbolType =
 
 export interface BaseSymbol {
   file: string;
-  line: number;
+  startLine: number;
   type: SymbolType;
 }
 
 export interface Symbol extends BaseSymbol {
   symbol: string;
+  endLine?: number;
 }
 
 export interface SymbolLocation extends BaseSymbol {}
@@ -41,6 +42,7 @@ export type FileSymbols = Record<string, FileData>;
 export interface GlobalSearchItem {
   label: string;
   alwaysShow: boolean;
+  detail?: string;
   entry: SymbolSearchEntry;
 }
 
@@ -48,4 +50,9 @@ export interface MultiMatchItem {
   label: string;
   location: SymbolLocation;
   detail: string;
+}
+export interface OpenBlock {
+  type: SymbolType;
+  symbol: string;
+  startLine: number;
 }

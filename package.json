@@ -3,7 +3,8 @@
   "displayName": "Ruby Symbol Search",
   "description": "Effortlessly explore and pinpoint Ruby symbols in your codebase with lightning-fast precision.",
   "version": "0.0.1",
-  "publisher": "bkaz",
+  "icon": "logo.png",
+  "publisher": "vscode-bkaz",
   "repository": {
     "url": "https://github.com/bk-az/ruby-symbol-search"
   },
@@ -29,6 +30,18 @@
         "title": "Search Ruby Symbols"
       }
     ],
+    "keybindings": [
+      {
+        "command": "rubySymbolSearch.search",
+        "key": "ctrl+shift+r",
+        "when": "!isMac"
+      },
+      {
+        "command": "rubySymbolSearch.search",
+        "key": "cmd+shift+r",
+        "when": "isMac"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Ruby Symbol Search",
@@ -38,13 +51,21 @@
           "items": {
             "type": "string"
           },
-          "default": [],
+          "default": [
+            "**/node_modules",
+            "**/log"
+          ],
           "description": "Folders to exclude from Ruby symbol indexing."
         },
         "rubySymbolSearch.autoIndex": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically index Ruby files when they are created or modified."
+          "description": "Automatically index Ruby files on startup and file changes."
+        },
+        "rubySymbolSearch.enableDocumentSymbols": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the Document Symbol Provider for Ruby files."
         }
       }
     }
@@ -77,7 +98,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "flexsearch": "^0.7.43",
+    "fuse.js": "^7.0.0",
     "minimatch": "^10.0.1"
   }
 }

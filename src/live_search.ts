@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import { GlobalSearchItem, SymbolLocation } from "./types";
 import SymbolStore from "./symbol_store";
 import Formatter from "./formatter";
@@ -7,13 +6,13 @@ import Formatter from "./formatter";
 export default class LiveSearch {
   symbolStore: SymbolStore;
   quickPick: vscode.QuickPick<GlobalSearchItem>;
-  basePath: string;
 
-  constructor(symbolStore: SymbolStore, basePath: string) {
+  constructor(symbolStore: SymbolStore) {
     this.symbolStore = symbolStore;
     this.quickPick = vscode.window.createQuickPick();
-    this.quickPick.placeholder = "Type to search for Ruby symbols";
-    this.basePath = basePath;
+    this.quickPick.matchOnDetail = true;
+    this.quickPick.placeholder =
+      "Type to search for Ruby symbols. Use '@' followed by a filename to filter results by the filename";
   }
   init() {
     this.registerEventHandlers();
@@ -58,7 +57,9 @@ export default class LiveSearch {
           const matchOptions = new Formatter().formatNested(selected.entry);
           vscode.window
             .showQuickPick(matchOptions, {
-              placeHolder: "Select a file for the symbol",
+              placeHolder:
+                "Multiple matches found. Refine your search by typing the filename to locate the desired symbol.",
+              matchOnDetail: true,
             })
             .then((fileSelected) => {
               if (fileSelected && fileSelected.location) {
@@ -74,19 +75,13 @@ export default class LiveSearch {
   }
 
   goToLocation(location: SymbolLocation) {
-    const { file, line } = location;
-    vscode.workspace
-      .openTextDocument(this.getFullPath(file))
-      .then((document) => {
-        vscode.window.showTextDocument(document).then((editor) => {
-          const position = new vscode.Position(line - 1, 0);
-          editor.selection = new vscode.Selection(position, position);
-          editor.revealRange(new vscode.Range(position, position));
-        });
+    const { file, startLine } = location;
+    vscode.workspace.openTextDocument(file).then((document) => {
+      vscode.window.showTextDocument(document).then((editor) => {
+        const position = new vscode.Position(startLine - 1, 0);
+        editor.selection = new vscode.Selection(position, position);
+        editor.revealRange(new vscode.Range(position, position));
       });
-  }
-
-  getFullPath(relativePath: string): string {
-    return path.resolve(this.basePath, relativePath);
+    });
   }
 }

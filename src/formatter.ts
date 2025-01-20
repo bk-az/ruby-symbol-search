@@ -12,13 +12,39 @@ export default class Formatter {
       }
 
       let icon = this.defaultIcon();
+      let summary = "";
       if (entry.locations.length === 1) {
         const location = entry.locations[0];
         icon = this.getIcon(location.type);
+        summary = `${vscode.workspace.asRelativePath(location.file)}:${
+          location.startLine
+        }`;
+      } else {
+        const typeCounts = entry.locations.reduce(
+          (counts: Record<string, number>, location) => {
+            const type = location.type;
+            counts[type] = (counts[type] || 0) + 1;
+            return counts;
+          },
+          {}
+        );
+        const sortedCounts = Object.fromEntries(
+          Object.entries(typeCounts).sort(
+            ([, valueA], [, valueB]) => valueA - valueB
+          )
+        );
+        summary = Object.keys(sortedCounts)
+          .reduce((list: string[], type) => {
+            list.push(`${this.getIcon(type)}(${sortedCounts[type]})`);
+            return list;
+          }, [])
+          .join(",");
+        summary = `$(indent) ${summary}`;
       }
 
       result.push({
-        label: `${icon} ${entry.symbol}`,
+        label: `${icon} ${entry.symbol}`.trim(),
+        detail: summary,
         alwaysShow: true,
         entry,
       });
@@ -35,7 +61,7 @@ export default class Formatter {
       const relativePath = vscode.workspace.asRelativePath(entry.file);
       result.push({
         label: `${icon} ${item.symbol}`,
-        detail: `${relativePath}:${entry.line}`,
+        detail: `${relativePath}:${entry.startLine}`,
         location: entry,
       });
     }
