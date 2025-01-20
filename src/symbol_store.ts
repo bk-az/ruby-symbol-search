@@ -13,7 +13,7 @@ export default class SymbolStore {
   symbolIdMap: Record<number, string>;
   fileIdMap: Record<number, string>;
   excludedFolders: string[];
-  fuseIndex: any;
+  fuseIndex: typeof Fuse;
   indexInProgress: boolean;
 
   constructor() {
