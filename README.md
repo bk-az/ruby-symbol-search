@@ -11,7 +11,7 @@ A Visual Studio Code extension designed to boost productivity with lightning-fas
 ### 1. Lightning-Fast Symbol Indexing
 - **Instant Indexing**: Rapidly scans and indexes all Ruby symbols (classes, modules, methods, etc.) in your workspace in seconds.  
 - **Real-Time Sync**: Updates the index immediately as Ruby files are added, edited, or removed, ensuring no delays.  
-- **Live Progress Feedback**: Displays quick status updates in the status bar, like `Ruby Symbols: Indexing` and `Ruby Symbols: Indexing Completed`, so you’re always informed.
+- **Live Progress Feedback**: Displays quick status updates in the status bar so you’re always informed.
 
 ### 2. Smart Search and Seamless Navigation
 - **Intelligent Fuzzy Matching**: Type a symbol name or a partial match, and results are ranked instantly based on relevance, saving time and effort.  
