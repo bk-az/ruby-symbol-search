@@ -1,4 +1,4 @@
-import Fuse from "fuse.js";
+const Fuse = require("fuse.js");
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
@@ -13,7 +13,7 @@ export default class SymbolStore {
   symbolIdMap: Record<number, string>;
   fileIdMap: Record<number, string>;
   excludedFolders: string[];
-  fuseIndex: Fuse<string>;
+  fuseIndex: any;
   indexInProgress: boolean;
 
   constructor() {
@@ -51,7 +51,7 @@ export default class SymbolStore {
         .map((id) => this.symbolIdMap[id]);
     } else {
       const results = this.fuseIndex.search(searchTerm.trim());
-      symbols = results.map((r) => r.item);
+      symbols = results.map((r: any) => r.item);
     }
     const result: SymbolSearchEntry[] = [];
     for (const symbol of symbols) {
@@ -185,7 +185,7 @@ export default class SymbolStore {
       if (globalEntry.locations.length === 0) {
         delete this.globalSymbols[sym];
         delete this.symbolIdMap[id];
-        this.fuseIndex.remove((doc) => {
+        this.fuseIndex.remove((doc: string) => {
           return doc === sym;
         });
       }
