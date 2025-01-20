@@ -6,33 +6,22 @@ A Visual Studio Code extension designed to boost productivity with lightning-fas
 
 ![demo](https://github.com/user-attachments/assets/f1867183-1029-4866-9df9-d7a4fb29c0cb)
 
-## Features
+## Key Mappings for Global Search
 
-### 1. Lightning-Fast Symbol Indexing
-- **Instant Indexing**: Rapidly scans and indexes all Ruby symbols (classes, modules, methods, etc.) in your workspace in seconds.  
-- **Real-Time Sync**: Updates the index immediately as Ruby files are added, edited, or removed, ensuring no delays.  
-- **Live Progress Feedback**: Displays quick status updates in the status bar so you’re always informed.
+Installing this extension automatically adds a default key mapping, allowing you to effortlessly search for any Ruby symbol across your workspace.
 
-### 2. Smart Search and Seamless Navigation
-- **Intelligent Fuzzy Matching**: Type a symbol name or a partial match, and results are ranked instantly based on relevance, saving time and effort.  
-- **Context-Aware File Filtering**:  
-  - Refine your search to specific files by appending `@ file_name` to your query.  
-  - Examples: `send_notification @ models/document.rb`, `send_notification @ models document`, or even `send_notification @ document`—all work seamlessly.  
-- **Quick Symbol Listing**:  
-  - Effortlessly find all symbols in a specific file (whether it’s open or not) using the `@ file_name` syntax anywhere in editor through global search input.  
-  - Example: `@ app/controllers/application_controller.rb` or `@ application controller` delivers precise results in moments.
+### Default Key Mapping
+- **Mac**: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
+- **Windows/Linux**: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
 
-### 3. Go to Symbol in File (Current File)
-1. In currently opened Ruby file, press <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> (Windows/Linux).  
-2. Choose a symbol to navigate within the current file.  
-3. To disable this feature, set `rubySymbolSearch.enableDocumentSymbols` to `false` in **Settings**.
+### Customizing the Key Mapping
+To customize the key binding:
+1. Open **Keyboard Shortcuts** (`Cmd+K Cmd+S` on Mac or equivalent on Windows/Linux).
+2. Search for `rubySymbolSearch.search`.
+3. Modify the key binding to your preference.
 
-## Key Mappings
-- **Default Shortcuts**:  
-  - **Mac**: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
-  - **Windows/Linux**: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
-- **Customization**:  
-  - Go to **Keyboard Shortcuts** (`Cmd+K Cmd+S` on Mac) and find `rubySymbolSearch.search` to change the key binding.
+---
+
 
 ## Commands
 You can access two primary commands from the Command Palette (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>):
@@ -41,6 +30,30 @@ You can access two primary commands from the Command Palette (<kbd>Cmd</kbd>+<kb
 |-------------------------|----------------------------------------------------------|
 | **Ruby Symbol Search: Index Files**    | Manually re-index all Ruby files in the workspace.      |
 | **Ruby Symbol Search: Search Symbols** | Opens the global search for Ruby symbols.               |
+
+---
+
+
+## Features
+
+### 1. Lightning-Fast Symbol Indexing
+- **Instant Indexing**: Rapidly scans and indexes all Ruby symbols (classes, modules, methods, etc.) in your workspace in seconds.  
+- **Real-Time Sync**: Updates the index immediately as Ruby files are added, edited, or removed, ensuring no delays.  
+- **Live Progress Feedback**: Displays quick status updates in the status bar so you’re always informed.
+
+### 2. Smart Search and Seamless Navigation (Global Search)
+- **Fuzzy Matching**: Type a symbol name or a partial match, and results are ranked instantly based on relevance, saving time and effort.  
+- **File Filtering**:  
+  - Refine your search to specific files by appending `@ file_name` to your query.  
+  - Examples: `send_notification @ models/document.rb`, `send_notification @ models document`, or even `send_notification @ document`—all work seamlessly.  
+- **File Symbol Listing**:  
+  - Effortlessly find all symbols in a specific file (whether it’s open or not) using the `@ file_name` syntax anywhere in editor through global search input.  
+  - Example: `@ app/controllers/application_controller.rb` or `@ application controller` delivers precise results in moments.
+
+### 3. Go to Symbol (Local File Search)
+1. In currently opened Ruby file, use VS code go-to-symbol command.  
+2. Choose a symbol to navigate within the current file.  
+3. To disable this feature, set `rubySymbolSearch.enableDocumentSymbols` to `false` in **Settings**.
 
 ---
 
