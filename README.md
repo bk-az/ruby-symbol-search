@@ -1,103 +1,163 @@
 # Ruby Symbol Search
 
-A Visual Studio Code extension designed to boost productivity with lightning-fast, real-time search and navigation of Ruby symbols across your workspace.
+**Ruby Symbol Search** is a Visual Studio Code extension designed to enhance productivity by providing lightning-fast, real-time search and navigation of Ruby symbols across your workspace. With this extension, you gain access to powerful features like Workspace-wide Ruby Symbol Search, Fuzzy Search, Go to Definition, File-level Symbol Navigation, and an Outline View of the current Ruby file — all without requiring the resource-heavy Ruby LSP.
 
 ---
-
-![demo](https://github.com/user-attachments/assets/f1867183-1029-4866-9df9-d7a4fb29c0cb)
-
-## Key Mappings for Global Search
-
-Installing this extension automatically adds a default key mapping, allowing you to effortlessly search for any Ruby symbol across your workspace.
-
-### Default Key Mapping
-- **Mac**: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
-- **Windows/Linux**: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>  
-
-### Customizing the Key Mapping
-To customize the key binding:
-1. Open **Keyboard Shortcuts** (`Cmd+K Cmd+S` on Mac or equivalent on Windows/Linux).
-2. Search for `rubySymbolSearch.search`.
-3. Modify the key binding to your preference.
-
----
-
-
-## Commands
-You can access two primary commands from the Command Palette (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>):
-
-| Command                 | Description                                              |
-|-------------------------|----------------------------------------------------------|
-| **Ruby Symbol Search: Index Files**    | Manually re-index all Ruby files in the workspace.      |
-| **Ruby Symbol Search: Search Symbols** | Opens the global search for Ruby symbols.               |
-
----
-
 
 ## Features
 
-### 1. Lightning-Fast Symbol Indexing
-- **Instant Indexing**: Rapidly scans and indexes all Ruby symbols (classes, modules, methods, etc.) in your workspace in seconds.  
-- **Real-Time Sync**: Updates the index immediately as Ruby files are added, edited, or removed, ensuring no delays.  
-- **Live Progress Feedback**: Displays quick status updates in the status bar so you’re always informed.
+### Search Ruby Symbols Across Workspace
+Quickly search for and navigate to any Ruby symbol across your entire workspace.
 
-### 2. Smart Search and Seamless Navigation (Global Search)
-- **Fuzzy Matching**: Type a symbol name or a partial match, and results are ranked instantly based on relevance, saving time and effort.  
-- **File Filtering**:  
-  - Refine your search to specific files by appending `@ file_name` to your query.  
-  - Examples: `send_notification @ models/document.rb`, `send_notification @ models document`, or even `send_notification @ document`—all work seamlessly.  
-- **File Symbol Listing**:  
-  - Effortlessly find all symbols in a specific file (whether it’s open or not) using the `@ file_name` syntax anywhere in editor through global search input.  
-  - Example: `@ app/controllers/application_controller.rb` or `@ application controller` delivers precise results in moments.
+**How to Use:**
+- Press <kbd>Ctrl</kbd> + <kbd>T</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>T</kbd> (macOS), type the initials of the symbol, and press Enter.
+- Optionally, filter results by file name.
 
-### 3. Go to Symbol (Local File Search)
-1. In currently opened Ruby file, use VS code go-to-symbol command.  
-2. Choose a symbol to navigate within the current file.  
-3. To disable this feature, set `rubySymbolSearch.enableDocumentSymbols` to `false` in **Settings**.
+<img width="645" alt="Search Example" src="https://github.com/user-attachments/assets/929c650f-2128-4dc4-8a2e-3230775242cf" />
+
+_Filtered results:_
+
+<img width="627" alt="Filtered Search" src="https://github.com/user-attachments/assets/56ec2d7c-6fcd-4d75-be2f-bb9b26ff8ea4" />
+
+---
+
+### Go to Definition
+Easily navigate to the definition of any Ruby symbol in your workspace.
+
+**How to Use:**
+- Press <kbd>F12</kbd> to go to the definition.
+- Additional shortcuts:
+  - <kbd>Ctrl</kbd> + <kbd>Click</kbd> or <kbd>Cmd</kbd> + <kbd>Click</kbd>: Jump to definition.
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Click</kbd> or <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>Click</kbd>: Open definition in a split view.
+  - <kbd>Alt</kbd> + <kbd>F12</kbd> or <kbd>Option</kbd> + <kbd>F12</kbd>: Peek definition.
+
+<img width="1070" alt="image" src="https://github.com/user-attachments/assets/fdf66618-f2da-4cc0-919e-ea4a0ce06bd9" />
+
+---
+
+### Outline View
+Get an overview of all symbols in the current Ruby file with the **Outline View**, accessible in the Explorer sidebar. Symbols are displayed in a tree structure for better navigation.
+
+<img width="966" alt="Outline View" src="https://github.com/user-attachments/assets/58eb53b2-8f41-4f54-858e-bbabee857a9b" />
+
+---
+
+### Go to Symbol in File
+Easily navigate to any symbol within the currently open Ruby file.
+
+**How to Use:**
+- Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd> (macOS).
+- Type `:` to group symbols by category.
+
+<img width="639" alt="Go to Symbol" src="https://github.com/user-attachments/assets/048fc6b1-7c07-43a5-9adc-898577495954" />
+
+---
+
+### Fuzzy Search
+Search for Ruby symbols across your workspace using fuzzy matching.
+
+**How to Use:**
+- Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (macOS).
+- Filter results by appending the file name after `@`.
+
+<img width="628" alt="image" src="https://github.com/user-attachments/assets/cb4e393c-6132-4606-8ddd-6b1bed2f0b34" />
+
+
+_Filtered by file:_
+
+<img width="619" alt="image" src="https://github.com/user-attachments/assets/b2da3de1-e989-4c7e-90e8-d606c2e614c1" />
+
+**Note:** To customize the key binding:
+1. Open **Keyboard Shortcuts** (<kbd>Ctrl</kbd> + <kbd>K</kbd> <kbd>Ctrl</kbd> + <kbd>S</kbd> or <kbd>Cmd</kbd> + <kbd>K</kbd> <kbd>Cmd</kbd> + <kbd>S</kbd>).
+2. Search for `rubySymbolSearch.search`.
+3. Modify the key binding as desired.
+
+---
+
+### List Symbols of a File
+List symbols of any Ruby file in your workspace without opening the file.
+
+**How to Use:**
+- Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (macOS).
+- Type `@` followed by the file name to display the symbols.
+
+<img width="621" alt="List Symbols" src="https://github.com/user-attachments/assets/2129565d-3ecb-4d48-9e67-aad8a373d0d6" />
+
+---
+
+### Lightning-Fast Indexing
+- **Instant Indexing**: Quickly scans all Ruby files in the workspace to index symbols such as classes, modules, and methods.
+- **Real-Time Updates**: Keeps the index in sync with changes to files.
+- **Status Feedback**: Provides real-time indexing status in the status bar.
+
+---
+
+## Supported Ruby Symbols
+
+The **Ruby Symbol Search** extension supports detection of the following Ruby symbols:
+
+| Symbol Type       | Recognized Patterns |
+|------------------|--------------------|
+| **Classes** | `class ClassName` <br> `class << ClassName` |
+| **Modules** | `module ModuleName` |
+| **Methods** | `def method_name` |
+| **Constants** | `CONSTANT_NAME = value` |
+| **Scopes** | `scope :scope_name` |
+| **Aliases** | `alias alias_name original_name` <br> `alias_method :alias_name, :original_name` <br> `alias_attribute :alias_name, :attribute_name` |
+| **Attributes** | `attr_reader :attribute` <br> `attr_writer :attribute` <br> `attr_accessor :attribute` <br> `mattr_reader :attribute` <br> `mattr_writer :attribute` <br> `mattr_accessor :attribute` <br> `thread_mattr_accessor :attribute` <br> `attribute :attribute` <br> `date_attribute :attribute` <br> `class_attribute :attribute` <br> `attributes :attribute` <br> `delegate :method` |
+| **Associations** | `belongs_to :association_name` <br> `has_one :association_name` <br> `has_many :association_name` <br> `has_and_belongs_to_many :association_name` |
+| **Namespaces** | `namespace :namespace_name` |
+| **Rake Tasks** | `task :task_name` |
+
+
+## Commands
+Access these commands from the Command Palette (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>):
+
+| Command                                   | Description                              |
+|-------------------------------------------|------------------------------------------|
+| **Ruby Symbol Search: Index Files**       | Re-index all Ruby files manually.        |
+| **Ruby Symbol Search: Search Symbols**    | Open global Ruby symbol search.          |
 
 ---
 
 ## Installation
 
-1. Install **Ruby Symbol Search** from the Visual Studio Code Marketplace.  
-2. Open a Ruby project in VS Code.  
-3. Indexing begins automatically if `autoIndex` is enabled (see [Configuration](#configuration)).
+1. Install **Ruby Symbol Search** from the Visual Studio Code Marketplace.
+2. Open a Ruby project in VS Code.
+3. Indexing starts automatically if `autoIndex` is enabled (see [Configuration](#configuration)).
 
 ---
 
 ## Configuration
 
-Customize the extension’s behavior through **Settings** or by editing your JSON settings directly:
+Customize the extension settings:
 
-- **`rubySymbolSearch.enableDocumentSymbols`** (default: `true`)  
-  Enable or disable the document symbol provider for Ruby files (used by Go to Symbol in File).
-  
-- **`rubySymbolSearch.autoIndex`** (default: `true`)  
-  Automatically indexes Ruby symbols on opening a workspace.
-  
-- **`rubySymbolSearch.excludedFolders`** (default: `["node_modules", "log"]`)  
-  Excludes specified folders from indexing.
+- **`rubySymbolSearch.autoIndex`** (default: `true`):  
+  Automatically index Ruby symbols when opening a workspace.
+
+- **`rubySymbolSearch.excludedFolders`** (default: `["node_modules", "log"]`):  
+  Exclude specific folders from indexing.
 
 ---
 
-## Usage Summary
+## Troubleshooting
 
-### 1. Global Search
-1. Press the **Search Ruby Symbols** key binding (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>) or run **Ruby Symbol Search: Search Symbols** from the Command Palette.  
-2. Type the name of the symbol (supports partial/fuzzy matches).  
-3. (Optional) Use `@ file_name` to filter results by file.  
-4. Select a result to jump directly to that symbol.
+If you encounter issues with **duplicate symbols** appearing in **global search** or **file search**, this could be caused by conflicting extensions. Please try the following steps:
 
-### 2. Go to Symbol in File (Current File)
-1. In currently opened Ruby file, press <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> (Windows/Linux).  
-2. Choose a symbol to navigate within the current file.  
-3. To disable this feature, set `rubySymbolSearch.enableDocumentSymbols` to `false` in **Settings**.
+1. **Disable Ruby LSP Extension**:  
+   - Ruby LSP will index symbols separately, leading to duplication.
+   - Disable it by navigating to the Extensions view (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd>) and deactivating the Ruby LSP extension.
+
+2. **Disable Ruby-Symbols Extension**:
+   - If installed, this extension might conflict with Ruby Symbol Search.
+   - Follow the same steps to disable it in the Extensions view.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! If you find issues or have feature requests, please file an issue or pull request in the [GitHub repository](https://github.com/bk-az/ruby-symbol-search).
+We welcome contributions!  
+If you encounter issues or have feature suggestions, please file an issue or a pull request in the [GitHub repository](https://github.com/bk-az/ruby-symbol-search).
 
 ---
 
