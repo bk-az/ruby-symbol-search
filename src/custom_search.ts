@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { GlobalSearchItem, SymbolLocation } from "./types";
+import { DropDownItem, SymbolLocation } from "./types";
+import CustomSearchFormatter from "./custom_search_formatter";
 import SymbolStore from "./symbol_store";
-import Formatter from "./formatter";
 
-export default class LiveSearch {
+export default class CustomSearch {
   symbolStore: SymbolStore;
-  quickPick: vscode.QuickPick<GlobalSearchItem>;
+  quickPick: vscode.QuickPick<DropDownItem>;
 
   constructor(symbolStore: SymbolStore) {
     this.symbolStore = symbolStore;
@@ -34,7 +34,9 @@ export default class LiveSearch {
 
       const searchResults = this.symbolStore.search(query);
       if (searchResults.length > 0) {
-        this.quickPick.items = new Formatter().format(searchResults);
+        this.quickPick.items = new CustomSearchFormatter().formatGlobalResults(
+          searchResults
+        );
       } else {
         this.quickPick.items = [
           {
@@ -50,11 +52,13 @@ export default class LiveSearch {
   registerOnSelect() {
     this.quickPick.onDidAccept(() => {
       const selected = this.quickPick.selectedItems[0];
-      if (selected && selected.entry) {
+      if (selected && selected.entry && "locations" in selected.entry) {
         const locations = selected.entry.locations;
 
         if (locations.length > 1) {
-          const matchOptions = new Formatter().formatNested(selected.entry);
+          const matchOptions = new CustomSearchFormatter().formatFileResults(
+            selected.entry
+          );
           vscode.window
             .showQuickPick(matchOptions, {
               placeHolder:
@@ -62,8 +66,8 @@ export default class LiveSearch {
               matchOnDetail: true,
             })
             .then((fileSelected) => {
-              if (fileSelected && fileSelected.location) {
-                this.goToLocation(fileSelected.location);
+              if (fileSelected && fileSelected.entry) {
+                this.goToLocation(fileSelected.entry as SymbolLocation);
               }
             });
         } else if (locations.length === 1) {

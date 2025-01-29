@@ -3,11 +3,17 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { minimatch } from "minimatch";
-import { GlobalSymbols, FileSymbols, Symbol, SymbolSearchEntry } from "./types";
+import {
+  GroupedSymbols,
+  FileSymbols,
+  Symbol,
+  SymbolSearchResult,
+  SymbolGroup,
+} from "./types";
 import FileParser from "./file_parser";
 
 export default class SymbolStore {
-  globalSymbols: GlobalSymbols;
+  globalSymbols: GroupedSymbols;
   fileSymbols: FileSymbols;
   idCounter: number;
   symbolIdMap: Record<number, string>;
@@ -23,7 +29,6 @@ export default class SymbolStore {
     this.fileIdMap = {};
     this.idCounter = 1;
     this.fuseIndex = new Fuse([], {
-      includeScore: true,
       threshold: 0.5,
       findAllMatches: true,
       shouldSort: true,
@@ -34,10 +39,21 @@ export default class SymbolStore {
     this.excludedFolders = config.get<string[]>("excludedFolders", []);
   }
 
-  search(query: string): SymbolSearchEntry[] {
-    let [searchTerm, fileQuery] = query.split("@");
-    let symbols: string[] = [];
-    let fileQueryTerms: string[] = [];
+  search(
+    query: string,
+    options = { limit: 20, fileSearch: true }
+  ): SymbolSearchResult[] {
+    let searchTerm,
+      fileQuery = "";
+    let symbols: string[],
+      fileQueryTerms: string[] = [];
+
+    if (options.fileSearch) {
+      [searchTerm, fileQuery] = query.split("@");
+    } else {
+      searchTerm = query;
+    }
+
     if (fileQuery) {
       fileQueryTerms = fileQuery
         .trim()
@@ -50,10 +66,12 @@ export default class SymbolStore {
         .flatMap((f) => this.fileSymbols[f].symbolIds)
         .map((id) => this.symbolIdMap[id]);
     } else {
-      const results = this.fuseIndex.search(searchTerm.trim());
+      const results = this.fuseIndex.search(searchTerm.trim(), {
+        limit: options.limit,
+      });
       symbols = results.map((r: any) => r.item);
     }
-    const result: SymbolSearchEntry[] = [];
+    const result: SymbolSearchResult[] = [];
     for (const symbol of symbols) {
       const globalEntry = this.globalSymbols[symbol];
       if (!globalEntry) {
@@ -117,7 +135,10 @@ export default class SymbolStore {
 
       if (entry.isDirectory()) {
         await this.indexFolder(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith(".rb")) {
+      } else if (
+        entry.isFile() &&
+        (entry.name.endsWith(".rb") || entry.name.endsWith(".rake"))
+      ) {
         this.indexRubyFile(fullPath);
       }
     }
@@ -135,6 +156,10 @@ export default class SymbolStore {
     parser.getSymbols().forEach((symbol: Symbol) => {
       this.registerSymbol(symbol);
     });
+  }
+
+  getSymbolInformation(symbol: string): SymbolGroup | undefined {
+    return this.globalSymbols[symbol];
   }
 
   registerSymbol(symbol: Symbol) {

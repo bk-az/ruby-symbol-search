@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import FileParser from "./file_parser";
+import { mapSymbolTypeToKind } from "./utility";
 
 export default class RubyDocumentSymbolProvider
   implements vscode.DocumentSymbolProvider
@@ -27,33 +28,7 @@ export default class RubyDocumentSymbolProvider
     const documentSymbols: vscode.SymbolInformation[] = [];
 
     for (const symbol of symbols) {
-      let symbolKind: vscode.SymbolKind;
-
-      switch (symbol.type) {
-        case "class":
-          symbolKind = vscode.SymbolKind.Class;
-          break;
-        case "module":
-          symbolKind = vscode.SymbolKind.Namespace;
-          break;
-        case "method":
-          symbolKind = vscode.SymbolKind.Method;
-          break;
-        case "attr":
-          symbolKind = vscode.SymbolKind.Field;
-          break;
-        case "association":
-          symbolKind = vscode.SymbolKind.Interface;
-          break;
-        case "alias":
-          symbolKind = vscode.SymbolKind.Field;
-          break;
-        case "constant":
-          symbolKind = vscode.SymbolKind.Constant;
-          break;
-        default:
-          symbolKind = vscode.SymbolKind.Object;
-      }
+      const symbolKind: vscode.SymbolKind = mapSymbolTypeToKind(symbol.type);
 
       var range = new vscode.Range(
         new vscode.Position(symbol.startLine - 1, 0),

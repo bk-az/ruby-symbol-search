@@ -9,10 +9,18 @@
     "url": "https://github.com/bk-az/ruby-symbol-search"
   },
   "engines": {
-    "vscode": "^1.96.0"
+    "vscode": "^1.0.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
+  ],
+  "keywords": [
+    "ruby",
+    "ruby search",
+    "ruby global search",
+    "ruby symbol search",
+    "ruby go to definition",
+    "ruby symbol fuzzy search"
   ],
   "activationEvents": [
     "*",
@@ -21,6 +29,13 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "ruby",
+        "extensions": [".rb"],
+        "aliases": ["Ruby"]
+      }
+    ],
     "commands": [
       {
         "command": "rubySymbolSearch.index",

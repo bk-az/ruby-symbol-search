@@ -5,7 +5,8 @@ export type SymbolType =
   | "constant"
   | "scope"
   | "alias"
-  | "attr"
+  | "attribute"
+  | "delegate"
   | "association"
   | "if"
   | "unless"
@@ -16,61 +17,56 @@ export type SymbolType =
   | "begin"
   | "do"
   | "block"
+  | "namespace"
+  | "task"
   | "comment"
   | "end"
   | "unknown";
 
 export interface OpenBlock {
   type: SymbolType;
+  indentation: string;
   symbol: string;
   startLine: number;
 }
 
 export interface ParsedToken {
-  kind: "open" | "close" | "complete";
+  state: "open" | "close" | "complete";
   symbol: string;
   type: SymbolType;
 }
 
-export interface FileData {
+export interface FileMetaData {
   id: number;
   symbolIds: number[];
 }
-export interface BaseSymbol {
+export interface SymbolLocation {
   file: string;
   startLine: number;
   type: SymbolType;
 }
-export interface Symbol extends BaseSymbol {
+export interface Symbol extends SymbolLocation {
   symbol: string;
   endLine?: number;
   detail?: string;
 }
 
-export interface SymbolLocation extends BaseSymbol {}
-
-export interface GlobalSymbol {
+export interface SymbolGroup {
   id: number;
   locations: SymbolLocation[];
 }
 
-export interface SymbolSearchEntry {
+export interface SymbolSearchResult {
   symbol: string;
   locations: SymbolLocation[];
 }
 
-export interface GlobalSearchItem {
+export interface DropDownItem {
   label: string;
-  alwaysShow: boolean;
+  alwaysShow?: boolean;
   detail?: string;
-  entry: SymbolSearchEntry;
+  entry: SymbolSearchResult | SymbolLocation;
 }
 
-export interface MultiMatchItem {
-  label: string;
-  location: SymbolLocation;
-  detail: string;
-}
-
-export type GlobalSymbols = Record<string, GlobalSymbol>;
-export type FileSymbols = Record<string, FileData>;
+export type GroupedSymbols = Record<string, SymbolGroup>;
+export type FileSymbols = Record<string, FileMetaData>;

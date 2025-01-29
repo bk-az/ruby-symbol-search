@@ -1,15 +1,16 @@
 // Import required modules
 import * as vscode from "vscode";
 import SymbolStore from "./symbol_store";
-import LiveSearch from "./live_search";
+import CustomSearch from "./custom_search";
 import RubyDocumentSymbolProvider from "./ruby_document_symbol_provider";
+import RubyWorkspaceSymbolProvider from "./ruby_workspace_symbol_provider";
+import { RubyDefinitionProvider } from "./ruby_definition_provider";
 
 const config = vscode.workspace.getConfiguration("rubySymbolSearch");
 const autoIndex = config.get<boolean>("autoIndex", true);
 let symbolStore = new SymbolStore();
 
 async function indexRubyFiles() {
-  symbolStore = new SymbolStore();
   await symbolStore.index();
 }
 
@@ -36,18 +37,35 @@ function watchFileChanges(context: vscode.ExtensionContext) {
 }
 
 async function searchRubySymbolsLive() {
-  const search = new LiveSearch(symbolStore);
+  const search = new CustomSearch(symbolStore);
   search.init();
 }
 
 export function activate(context: vscode.ExtensionContext) {
   const documentSymbolProvider =
     vscode.languages.registerDocumentSymbolProvider(
-      { scheme: "file", language: "ruby" },
+      {
+        language: "ruby",
+        scheme: "file",
+        pattern: "**/*.{rb,rake}",
+      },
       new RubyDocumentSymbolProvider()
     );
 
-  context.subscriptions.push(documentSymbolProvider);
+  const workspaceSymbolProvider =
+    vscode.languages.registerWorkspaceSymbolProvider(
+      new RubyWorkspaceSymbolProvider(symbolStore)
+    );
+
+  const definitionProvider = vscode.languages.registerDefinitionProvider(
+    {
+      language: "ruby",
+      scheme: "file",
+      pattern: "**/*.{rb,rake,erb,slim}",
+    },
+    new RubyDefinitionProvider(symbolStore)
+  );
+
   const indexCommand = vscode.commands.registerCommand(
     "rubySymbolSearch.index",
     indexRubyFiles
@@ -57,6 +75,9 @@ export function activate(context: vscode.ExtensionContext) {
     searchRubySymbolsLive
   );
 
+  context.subscriptions.push(documentSymbolProvider);
+  context.subscriptions.push(workspaceSymbolProvider);
+  context.subscriptions.push(definitionProvider);
   context.subscriptions.push(indexCommand);
   context.subscriptions.push(searchCommand);
 
