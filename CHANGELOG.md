@@ -1,9 +1,31 @@
-# Change Log
+# Changelog
 
-All notable changes to the "ruby-symbol-search" extension will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [4.0.0] - 2025-01-29  
+### Added  
+- Support for **Workspace Symbol Provider**  
+- Support for **Go To Definition**  
 
-## [Unreleased]
+### Improved  
+- Enhanced file parsing performance by detecting hierarchy through indentation  
 
-- Initial release
+## [3.0.0] - 2025-01-21  
+### Changed  
+- Major update to the symbol parser  
+
+### Added  
+- Support for additional symbols  
+- Hierarchical structure support in document symbols  
+
+## [2.0.0] - 2025-01-20 
+### Added  
+- Support for **Document Symbol Provider**  
+
+## [1.0.0] - 2025-01-20  
+### Changed  
+- Migrated from **FlexSearch** to **Fuse.js**  
+
+## [0.0.1] - 2025-01-18  
+### Initial Release  
+- First version of the project  
