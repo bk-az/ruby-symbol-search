@@ -30,6 +30,10 @@ const symbolPatterns: Record<string, { regex: RegExp; type: SymbolType }> = {
     regex: /^\s*date_attribute\(?\s*:(\w+[?!=]?)?/,
     type: "attribute",
   },
+  class_attribute: {
+    regex: /^\s*class_attribute\(?\s*((?::\w+[?!=]?)(?:\s*,\s*:\w+[?!=]?)*)?/,
+    type: "attribute",
+  },
   attributes: {
     regex: /^\s*attributes\(?\s*((?::\w+[?!=]?)(?:\s*,\s*:\w+[?!=]?)*)?/,
     type: "attribute",

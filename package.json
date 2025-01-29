@@ -2,7 +2,7 @@
   "name": "ruby-symbol-search",
   "displayName": "Ruby Symbol Search",
   "description": "Effortlessly explore and pinpoint Ruby symbols in your codebase with lightning-fast precision.",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "icon": "logo.png",
   "publisher": "vscode-bkaz",
   "repository": {
@@ -77,11 +77,6 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically index Ruby files on startup and file changes."
-        },
-        "rubySymbolSearch.enableDocumentSymbols": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable the Document Symbol Provider for Ruby files."
         }
       }
     }

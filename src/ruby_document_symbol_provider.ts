@@ -14,16 +14,6 @@ export default class RubyDocumentSymbolProvider
     const parser = new FileParser(filePath, content, {
       fetchDetails: true,
     });
-    const config = vscode.workspace.getConfiguration("rubySymbolSearch");
-    const enableDocumentSymbols = config.get<boolean>(
-      "enableDocumentSymbols",
-      true
-    );
-
-    if (!enableDocumentSymbols) {
-      return [];
-    }
-
     const symbols = parser.getSymbols(); // Get symbols from the parser
     const documentSymbols: vscode.SymbolInformation[] = [];
 
