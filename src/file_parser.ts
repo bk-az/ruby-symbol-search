@@ -5,7 +5,10 @@ const symbolPatterns: Record<string, { regex: RegExp; type: SymbolType }> = {
   sClass: { regex: /^\s*class\s*<<\s*([^\s;]+)/, type: "class" },
   module: { regex: /^\s*module\s+([^\s;]+)/, type: "module" },
   method: { regex: /^\s*def\s+([^\s(;]+)/, type: "method" },
-  constant: { regex: /^\s*([A-Z][A-Za-z0-9_:]*)\s*=[^=>~]/, type: "constant" },
+  constant: {
+    regex: /^\s*([A-Z][A-Za-z0-9_:]*)\s*=(?:[^=>~]|$)/,
+    type: "constant",
+  },
   scope: { regex: /^\s*scope\s+:([a-zA-Z0-9_]+[!?]?)/, type: "scope" },
   alias: { regex: /^\s*alias\s+([^\s]+)/, type: "alias" },
   aliasM: { regex: /^\s*alias_method\s+:([^\s,]+)/, type: "alias" },
